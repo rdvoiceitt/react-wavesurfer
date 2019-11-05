@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import assign from 'deep-assign';
+import WaveSurfer from 'wavesurfer.js';
 
 const EVENTS = [
   'audioprocess',
@@ -53,7 +54,7 @@ const resizeThrottler = fn => () => {
   }
 };
 
-class Wavesurfer extends Component {
+class ReactWavesurfer extends Component {
   constructor(props) {
     super(props);
 
@@ -61,11 +62,6 @@ class Wavesurfer extends Component {
       isReady: false
     };
 
-    if (typeof WaveSurfer === undefined) {
-      throw new Error('WaveSurfer is undefined!');
-    }
-
-    this._wavesurfer = Object.create(WaveSurfer);
     this._loadMediaElt = this._loadMediaElt.bind(this);
     this._loadAudio = this._loadAudio.bind(this);
     this._seekTo = this._seekTo.bind(this);
@@ -105,7 +101,7 @@ class Wavesurfer extends Component {
       options.backend = 'MediaElement';
     }
 
-    this._wavesurfer.init(options);
+    this._wavesurfer = WaveSurfer.create(options);
 
     // file was loaded, wave was drawn
     this._wavesurfer.on('ready', () => {
@@ -192,61 +188,61 @@ class Wavesurfer extends Component {
   }
 
   // update wavesurfer rendering manually
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     let newSource = false;
     let seekToInNewFile;
 
     // update audioFile
-    if (this.props.audioFile !== nextProps.audioFile) {
+    if (this.props.audioFile !== prevProps.audioFile) {
       this.setState({
         isReady: false
       });
-      this._loadAudio(nextProps.audioFile, nextProps.audioPeaks);
+      this._loadAudio(this.props.audioFile, this.props.audioPeaks);
       newSource = true;
     }
 
     // update mediaElt
-    if (this.props.mediaElt !== nextProps.mediaElt) {
+    if (this.props.mediaElt !== prevProps.mediaElt) {
       this.setState({
         isReady: false
       });
-      this._loadMediaElt(nextProps.mediaElt, nextProps.audioPeaks);
+      this._loadMediaElt(this.props.mediaElt, this.props.audioPeaks);
       newSource = true;
     }
 
     // update peaks
-    if (this.props.audioPeaks !== nextProps.audioPeaks) {
-      if (nextProps.mediaElt) {
-        this._loadMediaElt(nextProps.mediaElt, nextProps.audioPeaks);
+    if (this.props.audioPeaks !== prevProps.audioPeaks) {
+      if (this.props.mediaElt) {
+        this._loadMediaElt(this.props.mediaElt, this.props.audioPeaks);
       } else {
-        this._loadAudio(nextProps.audioFile, nextProps.audioPeaks);
+        this._loadAudio(this.props.audioFile, this.props.audioPeaks);
       }
     }
 
     // update position
     if (
-      nextProps.pos !== undefined &&
+      this.props.pos !== undefined &&
       this.state.isReady &&
-      nextProps.pos !== this.props.pos &&
-      nextProps.pos !== this.state.pos
+      prevProps.pos !== this.props.pos &&
+      this.props.pos !== this.state.pos
     ) {
       if (newSource) {
         seekToInNewFile = this._wavesurfer.on('ready', () => {
-          this._seekTo(nextProps.pos);
+          this._seekTo(this.props.pos);
           seekToInNewFile.un();
         });
       } else {
-        this._seekTo(nextProps.pos);
+        this._seekTo(this.props.pos);
       }
     }
 
     // update playing state
     if (
       !newSource &&
-      (this.props.playing !== nextProps.playing ||
-        this._wavesurfer.isPlaying() !== nextProps.playing)
+      (this.props.playing !== prevProps.playing ||
+        this._wavesurfer.isPlaying() !== this.props.playing)
     ) {
-      if (nextProps.playing) {
+      if (this.props.playing) {
         this._wavesurfer.play();
       } else {
         this._wavesurfer.pause();
@@ -254,32 +250,32 @@ class Wavesurfer extends Component {
     }
 
     // update volume
-    if (this.props.volume !== nextProps.volume) {
-      this._wavesurfer.setVolume(nextProps.volume);
+    if (this.props.volume !== prevProps.volume) {
+      this._wavesurfer.setVolume(this.props.volume);
     }
 
     // update volume
-    if (this.props.zoom !== nextProps.zoom) {
-      this._wavesurfer.zoom(nextProps.zoom);
+    if (this.props.zoom !== prevProps.zoom) {
+      this._wavesurfer.zoom(this.props.zoom);
     }
 
     // update audioRate
-    if (this.props.options.audioRate !== nextProps.options.audioRate) {
-      this._wavesurfer.setPlaybackRate(nextProps.options.audioRate);
+    if (this.props.options.audioRate !== prevProps.options.audioRate) {
+      this._wavesurfer.setPlaybackRate(this.props.options.audioRate);
     }
 
     // turn responsive on
     if (
-      nextProps.responsive &&
-      this.props.responsive !== nextProps.responsive
+      this.props.responsive &&
+      this.props.responsive !== prevProps.responsive
     ) {
       window.addEventListener('resize', this._handleResize, false);
     }
 
     // turn responsive off
     if (
-      !nextProps.responsive &&
-      this.props.responsive !== nextProps.responsive
+      !this.props.responsive &&
+      this.props.responsive !== prevProps.responsive
     ) {
       window.removeEventListener('resize', this._handleResize);
     }
@@ -355,12 +351,14 @@ class Wavesurfer extends Component {
   }
 
   render() {
-    const childrenWithProps = this.props.children
+    const childrenWithProps = (this._wavesurfer && this.props.children)
       ? React.Children.map(this.props.children, child =>
-          React.cloneElement(child, {
+          child 
+          ? React.cloneElement(child, {
             wavesurfer: this._wavesurfer,
             isReady: this.state.isReady
           })
+          : child
         )
       : false;
     return (
@@ -376,7 +374,7 @@ class Wavesurfer extends Component {
   }
 }
 
-Wavesurfer.propTypes = {
+ReactWavesurfer.propTypes = {
   playing: PropTypes.bool,
   pos: PropTypes.number,
   audioFile: (props, propName, componentName) => {
@@ -440,7 +438,7 @@ Wavesurfer.propTypes = {
   })
 };
 
-Wavesurfer.defaultProps = {
+ReactWavesurfer.defaultProps = {
   playing: false,
   pos: 0,
   options: WaveSurfer.defaultParams,
@@ -448,4 +446,4 @@ Wavesurfer.defaultProps = {
   onPosChange: () => {}
 };
 
-export default Wavesurfer;
+export default ReactWavesurfer;

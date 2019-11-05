@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions.min.js';
 
 const REGIONS_EVENTS = [
   'region-in',
@@ -45,13 +46,13 @@ class Regions extends Component {
 
   componentDidMount() {
     if (this.props.isReady) {
-      this._init.call(this);
+      this._init();
+    } else {
+      this.props.wavesurfer.on('ready', this._init);
     }
-
-    this.props.wavesurfer.on('ready', this._init.bind(this));
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate() {
     // only update if the wavesurfer instance has been ready
     if (!this.props.isReady) {
       return;
@@ -62,36 +63,33 @@ class Regions extends Component {
     let newRegionId;
     let oldRegionId;
 
-    for (newRegionId in nextProps.regions) {
-      if ({}.hasOwnProperty.call(nextProps.regions, newRegionId)) {
-        const newRegion = nextProps.regions[newRegionId];
+    for (newRegionId in this.props.regions) {
+      const newRegion = this.props.regions[newRegionId];
+      if (!newRegion) continue
 
-        // remove from oldRegions
-        delete oldRegions[newRegionId];
+      // remove from oldRegions
+      delete oldRegions[newRegionId];
 
-        // new regions
-        if (!this.props.wavesurfer.regions.list[newRegionId]) {
-          this._hookUpRegionEvents(nextProps.wavesurfer.addRegion(newRegion));
+      // new regions
+      if (!this.props.wavesurfer.regions.list[newRegionId]) {
+        this._hookUpRegionEvents(this.props.wavesurfer.addRegion(newRegion));
 
-          // update regions
-        } else if (
-          oldRegions[newRegionId] &&
-          (oldRegions[newRegionId].start !== newRegion.start ||
-            oldRegions[newRegionId].end !== newRegion.end)
-        ) {
-          nextProps.wavesurfer.regions.list[newRegionId].update({
-            start: newRegion.start,
-            end: newRegion.end
-          });
-        }
+        // update regions
+      } else if (
+        oldRegions[newRegionId] &&
+        (oldRegions[newRegionId].start !== newRegion.start ||
+          oldRegions[newRegionId].end !== newRegion.end)
+      ) {
+        this.props.wavesurfer.regions.list[newRegionId].update({
+          start: newRegion.start,
+          end: newRegion.end
+        });
       }
     }
 
     // remove any old regions
     for (oldRegionId in oldRegions) {
-      if ({}.hasOwnProperty.call(oldRegions, oldRegionId)) {
-        nextProps.wavesurfer.regions.list[oldRegionId].remove();
-      }
+      this.props.wavesurfer.regions.list[oldRegionId].remove();
     }
   }
 
@@ -105,8 +103,11 @@ class Regions extends Component {
     });
   }
 
-  _init() {
+  _init = () => {
     const { wavesurfer, regions } = this.props;
+
+    wavesurfer.addPlugin(RegionsPlugin.create({})).initPlugin('timeline')
+
     let newRegionId;
 
     REGIONS_EVENTS.forEach(e => {
@@ -123,7 +124,7 @@ class Regions extends Component {
 
     // add regions and hook up callbacks to region objects
     for (newRegionId in regions) {
-      if ({}.hasOwnProperty.call(regions, newRegionId)) {
+      if (regions[newRegionId]) {
         this._hookUpRegionEvents(wavesurfer.addRegion(regions[newRegionId]));
       }
     }
@@ -165,7 +166,7 @@ Regions.propTypes = {
 };
 
 Regions.defaultProps = {
-  regions: []
+  regions: {}
 };
 
 export default Regions;

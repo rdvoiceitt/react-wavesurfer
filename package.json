@@ -8,27 +8,27 @@
     "format": "prettier --single-quote true 'src/**/*.js*' --write",
     "start": "webpack-dev-server --progress --colors --config ./build-config/webpack.dev.js",
     "test": "./node_modules/.bin/jest",
-    "update-changelog": "github-changes -o mspae -r react-wavesurfer -a --order-semver",
+    "update-changelog": "github-changes -o rdvoiceitt -r react-wavesurfer -a --order-semver",
     "build:main": "./node_modules/.bin/webpack --progress --colors --config build-config/webpack.prod.main.js",
     "build:main.min": "./node_modules/.bin/webpack --progress --colors --config build-config/webpack.prod.main.min.js",
     "build:plugins": "./node_modules/.bin/webpack --progress --colors --config build-config/webpack.prod.plugins.js",
     "build:plugins.min": "./node_modules/.bin/webpack --progress --colors --config build-config/webpack.prod.plugins.min.js",
-    "build": "npm-run-all --parallel build:main build:main.min build:plugins build:plugins.min update-changelog",
+    "build": "npm-run-all --parallel build:main build:main.min build:plugins build:plugins.min",
     "prepublish": "npm run build"
   },
   "author": "Martin Spencer <mail@martinspencer.de>",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mspae/react-wavesurfer"
+    "url": "https://github.com/rdvoiceitt/react-wavesurfer"
   },
   "bugs": {
-    "url": "https://github.com/mspae/react-wavesurfer/issues"
+    "url": "https://github.com/rdvoiceitt/react-wavesurfer/issues"
   },
   "peerDependencies": {
     "react": "^15.3.1",
     "prop-types": "^15.5.10",
-    "wavesurfer.js": "^1.1.11"
+    "wavesurfer.js": "^3.2.0"
   },
   "devDependencies": {
     "babel": "^6.5.x",
@@ -58,7 +58,7 @@
     "react-dom": "^15.3.1",
     "script-loader": "^0.7.0",
     "uglifyjs-webpack-plugin": "^0.4.6",
-    "wavesurfer.js": "^1.1.11",
+    "wavesurfer.js": "^3.2.0",
     "webpack": "^3.5.4",
     "webpack-dev-server": "^2.7.1",
     "webpack-merge": "^4.1.0"
