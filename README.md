@@ -1,6 +1,8 @@
-# Project is unmaintained!
+# This is a fork of react-wavesurfer by Martin Spencer <mail@martinspencer.de>
 
-Please note I'm not maintaining this project anymore. I recommend using wavesurfer.js version 2 as it makes it much easier to use with React.
+Added support of wavesurfer.js@3.
+
+The original description below may not be up-to-date anymore
 
 # react-wavesurfer
 

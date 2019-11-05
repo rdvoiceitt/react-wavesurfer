@@ -1,7 +1,7 @@
 {
-  "name": "react-wavesurfer",
-  "version": "0.8.6",
-  "description": "React component wrapper for wavesurfer.js",
+  "name": "react-wavesurfer3",
+  "version": "1.0.0",
+  "description": "React component wrapper for wavesurfer.js@3",
   "main": "lib/react-wavesurfer.min.js",
   "scripts": {
     "lint": "eslint src",
@@ -16,7 +16,7 @@
     "build": "npm-run-all --parallel build:main build:main.min build:plugins build:plugins.min",
     "prepublish": "npm run build"
   },
-  "author": "Martin Spencer <mail@martinspencer.de>",
+  "author": "Roman Dubrov <romandubrov@voiceitt.com>",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
