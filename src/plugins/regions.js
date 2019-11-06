@@ -106,7 +106,7 @@ class Regions extends Component {
   _init = () => {
     const { wavesurfer, regions } = this.props;
 
-    wavesurfer.addPlugin(RegionsPlugin.create({})).initPlugin('timeline')
+    wavesurfer.addPlugin(RegionsPlugin.create({})).initPlugin('regions')
 
     let newRegionId;
 

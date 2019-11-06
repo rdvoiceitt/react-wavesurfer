@@ -17,6 +17,7 @@ class Timeline extends Component {
   _init = () => {
     this.props.wavesurfer.addPlugin(TimelinePlugin.create({
       container: this.timelineRef.current,
+      ...this.props.options
     })).initPlugin('timeline')
   }
 

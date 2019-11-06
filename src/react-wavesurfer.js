@@ -62,6 +62,8 @@ class ReactWavesurfer extends Component {
       isReady: false
     };
 
+    this.wavesurferEl = React.createRef()
+
     this._loadMediaElt = this._loadMediaElt.bind(this);
     this._loadAudio = this._loadAudio.bind(this);
     this._seekTo = this._seekTo.bind(this);
@@ -93,7 +95,7 @@ class ReactWavesurfer extends Component {
 
   componentDidMount() {
     const options = assign({}, this.props.options, {
-      container: this.wavesurferEl
+      container: this.wavesurferEl.current
     });
 
     // media element loading is only supported by MediaElement backend
@@ -353,7 +355,7 @@ class ReactWavesurfer extends Component {
   render() {
     const childrenWithProps = (this._wavesurfer && this.props.children)
       ? React.Children.map(this.props.children, child =>
-          child 
+          child
           ? React.cloneElement(child, {
             wavesurfer: this._wavesurfer,
             isReady: this.state.isReady
@@ -362,12 +364,8 @@ class ReactWavesurfer extends Component {
         )
       : false;
     return (
-      <div>
-        <div
-          ref={c => {
-            this.wavesurferEl = c;
-          }}
-        />
+      <div {...this.props.containerProps}>
+        <div ref={this.wavesurferEl} />
         {childrenWithProps}
       </div>
     );
@@ -434,7 +432,8 @@ ReactWavesurfer.propTypes = {
       PropTypes.string,
       PropTypes.instanceOf(window.CanvasGradient)
     ]),
-    autoCenter: PropTypes.bool
+    autoCenter: PropTypes.bool,
+    containerProps: PropTypes.object,
   })
 };
 
@@ -443,7 +442,8 @@ ReactWavesurfer.defaultProps = {
   pos: 0,
   options: WaveSurfer.defaultParams,
   responsive: true,
-  onPosChange: () => {}
+  onPosChange: () => {},
+  containerProps: {},
 };
 
 export default ReactWavesurfer;
