@@ -1,5 +1,8 @@
 ## Change Log
 
+### v1.0.1
+- Fix timeline does not display when regions used
+
 ### v1.0.0
 - Added support of wavesurfer.js@3
 
