@@ -59,7 +59,7 @@ class Regions extends Component {
     }
 
     // cache reference to old regions
-    const oldRegions = Object.create(this.props.wavesurfer.regions.list);
+    let oldRegions = {...prevProps.wavesurfer.regions.list};
     let newRegionId;
     let oldRegionId;
 
@@ -94,8 +94,18 @@ class Regions extends Component {
   }
 
   shouldComponentUpdate() {
-    return false;
-  }
+
+    // only update if there are regions
+    if (this.props.wavesurfer.regions === undefined) {
+      return false;
+    }
+
+    // only update if the wavesurfer instance has been ready
+    if (!this.props.isReady) {
+      return false;
+    }
+    return true;
+}
 
   componentWillUnmount() {
     REGION_EVENTS.forEach(e => {
