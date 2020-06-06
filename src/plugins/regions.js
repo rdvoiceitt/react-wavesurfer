@@ -52,11 +52,7 @@ class Regions extends Component {
     }
   }
 
-  componentDidUpdate() {
-    // only update if the wavesurfer instance has been ready
-    if (!this.props.isReady) {
-      return;
-    }
+  componentDidUpdate(prevProps) {
 
     // cache reference to old regions
     let oldRegions = {...prevProps.wavesurfer.regions.list};
